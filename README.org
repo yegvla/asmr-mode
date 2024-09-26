@@ -1,0 +1,40 @@
+#+title: asmr-mode
+#+author: Vladislav Yegorov
+#+language: en
+
+This mode is very close to the built-in asm-mode that comes with Emacs
+already.  It does not go over the top with features, but just adds
+some more sophisticated syntax-highlighting and better compatibility
+with other assemblers.
+
+Most notably this mode changes the tab behavior to be more in line
+with what Emacs usually does.  In this mode the tab behavior is left
+untouched from the configured default.  Some people like to have their
+arguments lined up in the same column (myself included), so if the
+=asmr-tab-after-operation= variable is set to a non-nil value then
+pressing space after an operation will automatically indent to the
+next tab stop.
+
+This mode also heavily relies on your =tab-stop-list=, if you want for
+example all your operations to be aligned in the 20th column, and the
+arguments in the 26th then you would set it to: ='(20 26)=.  If your
+=tab-width= is 8 and you want operations to be on the 16th column and
+arguments on the 24th, then just setting it ='(16)= would be enough.
+
+** Installation
+
+You can use the inbuilt =use-package= (Emacs 29) to enable asmr-mode
+in your configuration.
+
+Example:
+
+#+begin_src emacs-lisp
+  (use-package asmr-mode
+    :load-path "<path to asmr-mode>"
+    :mode "\\.[sS]\\'"
+    :hook (asmr-mode . (lambda ()
+                         (setq indent-tabs-mode t
+                               tab-stop-list '(16)
+                               comment-column 48
+                               asm-indent-level 8))))
+#+end_src
