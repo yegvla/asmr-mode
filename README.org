@@ -30,7 +30,11 @@ Example:
 
 #+begin_src emacs-lisp
   (use-package asmr-mode
-    :load-path "<path to asmr-mode>"
+    ;; If using Emacs 29:
+    ;; :load-path "<path to asmr-mode>"
+
+    ;; If you have Emacs 30 you can use vc:
+    :vc (:url https://github.com/yegvla/asmr-mode :branch main)
     :mode "\\.[sS]\\'"
     :hook (asmr-mode . (lambda ()
                          (setq indent-tabs-mode t
