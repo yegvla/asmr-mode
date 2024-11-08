@@ -20,6 +20,8 @@ example all your operations to be aligned in the 20th column, and the
 arguments in the 26th then you would set it to: ='(20 26)=.  If your
 =tab-width= is 8 and you want operations to be on the 16th column and
 arguments on the 24th, then just setting it ='(16)= would be enough.
+Generally speaking your configuration from =asm-mode= should work fine
+with asmr-mode.
 
 ** Installation
 
