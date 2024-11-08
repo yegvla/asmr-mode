@@ -179,6 +179,7 @@ after the operation.  The indentation is the next tab-stop."
   (setq-local indent-line-function #'asmr-indent-line)
   (setq-local imenu-generic-expression
               '((nil "^\\([^0-9#]\\(?:\\sw\\|\\s_\\)+\\):?" 1)))
+  (setq-local fill-paragraph-function #'asmr-c-fill-paragraph)
 
   ;; select comment style
   (funcall asmr-comment-style)
@@ -200,13 +201,14 @@ after the operation.  The indentation is the next tab-stop."
   "Auto-indent the current line."
   (interactive)
   (let* ((savep (point))
-         (indent (condition-case nil
-                     (save-excursion
-                       (forward-line 0)
-                       (skip-chars-forward " \t")
-                       (if (>= (point) savep) (setq savep nil))
-                       (max (asmr-calculate-indentation) 0))
-                   (error 0))))
+         (indent
+          (condition-case nil
+              (save-excursion
+                (forward-line 0)
+                (skip-chars-forward " \t")
+                (if (>= (point) savep) (setq savep nil))
+                (max (asmr-calculate-indentation) 0))
+            (error 0))))
     (if savep
         (save-excursion (indent-line-to indent))
       (indent-line-to indent))))
@@ -221,24 +223,27 @@ after the operation.  The indentation is the next tab-stop."
    (and (looking-at "\\s<\\{3,\\}") 0)
    ;; Simple `;' comments go to the comment-column.
    (and (looking-at "\\s<\\(\\S<\\|\\'\\)") comment-column)
+   ;; Align multi-line C-comments.
+   (and (looking-at "\\*") (+ (indent-next-tab-stop 0) 1))
    ;; The rest goes at the first tab stop.
    (indent-next-tab-stop 0)))
 
 (defun asmr-c-fill-paragraph (&rest args)
   "Handles c-style multi-line comments.  Very hacky."
   (interactive)
-  (when (asmr-is-inside-comment (point))
-    (let* ((fill-paragraph-handle-comment t)
-           (start (save-excursion (beginning-of-line 1) (point)))
-           (continuation (save-excursion (beginning-of-line 1)
-                                         (skip-syntax-forward " ")
-                                         (eq (char-after) ?/)))
-           (end (save-excursion (beginning-of-line 1)
-                                (skip-syntax-forward " " (line-end-position))
-                                (point)))
-           (fill-prefix (concat (buffer-substring-no-properties start end)
-                                (if continuation " " "") "* ")))
-      (apply #'fill-paragraph args))))
+  (if (asmr-is-inside-comment (point))
+      (let* ((fill-paragraph-handle-comment t)
+             (start (save-excursion (beginning-of-line 1) (point)))
+             (continuation (save-excursion (beginning-of-line 1)
+                                           (skip-syntax-forward " ")
+                                           (eq (char-after) ?/)))
+             (end (save-excursion (beginning-of-line 1)
+                                  (skip-syntax-forward " " (line-end-position))
+                                  (point)))
+             (fill-prefix (concat (buffer-substring-no-properties start end)
+                                  (if continuation " " "") "* ")))
+        (apply #'fill-paragraph args))
+    (asmr-indent-line) t))
 
 (defun asmr-electric-space ()
   "If a space is inserted at the beginning of the line then
