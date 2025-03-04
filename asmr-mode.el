@@ -140,8 +140,6 @@ after the operation.  The indentation is the next tab-stop."
   :type 'boolean
   :group 'asmr)
 
-
-;; TODO: Cleanup
 (defconst asmr-font-lock
   (append
    '(
@@ -168,6 +166,7 @@ after the operation.  The indentation is the next tab-stop."
      ;; TODO: No numbers as some assemblers use % for binary notation
      ;; %register for AT&T syntax.
      ("%\\sw+" . font-lock-variable-name-face))
+   doxygen-font-lock-keywords
    cpp-font-lock-keywords)
   "Additional expressions to highlight in Asmr mode.")
 
@@ -218,7 +217,7 @@ after the operation.  The indentation is the next tab-stop."
    ;; Flush labels to the left margin.
    (and (looking-at "\\(\\.?\\sw\\|\\s_\\)+:") 0)
    ;; Do the same with macros.
-   (and (looking-at "[ \t]*#") 0)
+   (and (looking-at "#") 0)
    ;; And with certain comments...
    (and (looking-at "\\s<\\{3,\\}") 0)
    ;; Simple `;' comments go to the comment-column.
@@ -334,3 +333,5 @@ character."
    (t (comment-dwim nil))))
 
 (provide 'asmr-mode)
+
+;; asmr-mode.el ends here
